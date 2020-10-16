@@ -9,23 +9,22 @@ export default {
   input: path.join(__dirname, "src", "index.ts"),
   output: {
     file: path.join(__dirname, "dist", `index.js`),
-    format: "iife",
-    sourcemap: true,
+    format: "umd",
+    sourcemap: true
   },
   treeshake: true,
   plugins: [
     resolve({
       browser: true,
-      preferBuiltins: true,
+      preferBuiltins: true
     }),
     typescript({
       rollupCommonJSResolveHack: true,
-      clean: true,
+      clean: true
     }),
     commonjs({
-      include: ["node_modules/**"],
+      include: ["node_modules/**"]
     }),
-    json(),
-  ],
+    json()
+  ]
 };
-
