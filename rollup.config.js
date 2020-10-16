@@ -9,7 +9,7 @@ export default {
   input: path.join(__dirname, "src", "index.ts"),
   output: {
     file: path.join(__dirname, "dist", `index.js`),
-    format: "umd",
+    format: "cjs",
     sourcemap: true
   },
   treeshake: true,
