@@ -1069,6 +1069,11 @@
   dependencies:
     eslint-visitor-keys "^1.1.0"
 
+"@yelo/rollup-node-external@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@yelo/rollup-node-external/-/rollup-node-external-1.0.1.tgz#f1cdc322f757c7e31008c91ea33329c6f5c9c728"
+  integrity sha512-3iYLKFECbISvItw3Sv2cDVSDI64QdthhKcHEmzWawp27KL/0qXWYPBnSkTnqybFoJ4mNjqjs9HuO52d5DZHjbw==
+
 abstract-leveldown@~0.12.0, abstract-leveldown@~0.12.1:
   version "0.12.4"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-0.12.4.tgz#29e18e632e60e4e221d5810247852a63d7b2e410"

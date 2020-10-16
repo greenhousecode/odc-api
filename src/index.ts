@@ -8,52 +8,42 @@ export default class ODC {
 
   static MANAGE_API_URL = "https://manage.lemonpi.io/api/v0";
 
-  constructor(credentials: Credentials) {
-    this.authenticate(credentials);
-  }
-
   private async request(
     url: string,
     method: "GET" | "POST" | "PUT",
-    data?: string | FormData
+    data?: any
   ) {
-    const headers = new Headers();
-
-    if (this.authentication) {
-      headers.set("Authorization", `lemonpi ${this.authentication.token}`);
-    }
-
-    headers.set("Host", "api.lemonpi.io");
-    headers.set("Origin", "https://manage.lemonpi.io");
-
-    const resp = await axios(url, {
+    return axios(url, {
       method,
       data: data && method !== "GET" ? data : undefined,
-      headers
+      headers: {
+        ...(this.authentication
+          ? { Authorization: `lemonpi ${this.authentication.token}` }
+          : {}),
+        Host: "api.lemonpi.io",
+        Origin: "https://manage.lemonpi.io"
+      }
     });
-
-    if (!/^20/.test(resp.status.toString()))
-      throw new Error(`Request failed, ${resp.statusText}`);
-
-    const contentType = resp.headers.get("content-type");
-
-    if (!contentType || contentType.indexOf("application/json") === -1) return;
-
-    // eslint-disable-next-line consistent-return
-    return resp;
   }
 
-  private async authenticate(credentials: Credentials) {
-    const formData = new FormData();
-    formData.append("email", credentials.email);
-    formData.append("password", credentials.password);
+  async authenticate(credentials: Credentials) {
+    const { email, password } = credentials;
+
+    if (!email || !password) {
+      throw new Error("Either your email, password or both are missing!");
+    }
 
     const response = await this.request(
       `${ODC.API_URL}/auth/user-token`,
       "POST",
-      formData
+      {
+        email,
+        password
+      }
     );
 
-    this.authentication = response;
+    this.authentication = response.data;
+
+    return this;
   }
 }

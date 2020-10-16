@@ -4,6 +4,7 @@ import typescript from "rollup-plugin-typescript2";
 import commonjs from "rollup-plugin-commonjs";
 import resolve from "rollup-plugin-node-resolve";
 import json from "rollup-plugin-json";
+import external from "@yelo/rollup-node-external";
 
 export default {
   input: path.join(__dirname, "src", "index.ts"),
@@ -12,6 +13,7 @@ export default {
     format: "cjs",
     sourcemap: true
   },
+  external: external(),
   treeshake: true,
   plugins: [
     resolve({
@@ -22,9 +24,7 @@ export default {
       rollupCommonJSResolveHack: true,
       clean: true
     }),
-    commonjs({
-      include: ["node_modules/**"]
-    }),
+    commonjs(),
     json()
   ]
 };
