@@ -1,4 +1,5 @@
-export declare interface Credentials {
-  email: string;
-  password: string;
+interface AuthClient {
+  authenticate(): Promise<string>;
 }
+
+type AuthToken = AuthClient | string;
