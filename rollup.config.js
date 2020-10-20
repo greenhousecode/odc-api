@@ -11,20 +11,20 @@ export default {
   output: {
     file: path.join(__dirname, "dist", `index.js`),
     format: "cjs",
-    sourcemap: true
+    sourcemap: true,
   },
   external: external(),
   treeshake: true,
   plugins: [
     resolve({
       browser: true,
-      preferBuiltins: true
+      preferBuiltins: true,
     }),
     typescript({
       rollupCommonJSResolveHack: true,
-      clean: true
+      clean: true,
     }),
     commonjs(),
-    json()
-  ]
+    json(),
+  ],
 };

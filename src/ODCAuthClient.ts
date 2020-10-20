@@ -7,12 +7,12 @@ interface Credentials {
 
 export enum LoginType {
   LEGACY,
-  NORMAL
+  NORMAL,
 }
 
 const LoginTypes = {
   [LoginType.LEGACY]: "https://manage.lemonpi.io/api/v0",
-  [LoginType.NORMAL]: "https://api.lemonpi.io"
+  [LoginType.NORMAL]: "https://api.lemonpi.io",
 };
 
 // export const AUTH_TOKEN_LIFETIME = 60 * 15 * 1000; // 15 minutes
@@ -34,7 +34,7 @@ export default class ODCAuthClient implements AuthClient {
       "/auth/refresh-user-token",
       "POST",
       {
-        "refresh-token": this.authentication["refresh-token"]
+        "refresh-token": this.authentication["refresh-token"],
       },
       false
     );
@@ -55,7 +55,7 @@ export default class ODCAuthClient implements AuthClient {
       "POST",
       {
         email,
-        password
+        password,
       },
       false
     );
@@ -103,8 +103,8 @@ export default class ODCAuthClient implements AuthClient {
       headers: {
         ...(this.authentication
           ? { Authorization: `lemonpi ${this.authentication["auth-token"]}` }
-          : {})
-      }
+          : {}),
+      },
     });
   }
 

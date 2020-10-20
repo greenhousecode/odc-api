@@ -29,7 +29,7 @@ export default class ODC {
     const resp = await axios(url, {
       method,
       data: data && method !== "GET" ? data : undefined,
-      headers
+      headers,
     });
 
     if (!/^20/.test(resp.status.toString()))
