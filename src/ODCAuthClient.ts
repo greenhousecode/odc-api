@@ -5,14 +5,14 @@ interface Credentials {
   password: string;
 }
 
-export enum LoginType {
+export enum ApiType {
   LEGACY,
   NORMAL,
 }
 
-const LoginTypes = {
-  [LoginType.LEGACY]: "https://manage.lemonpi.io/api/v0",
-  [LoginType.NORMAL]: "https://api.lemonpi.io",
+const ApiTypes = {
+  [ApiType.LEGACY]: "https://manage.lemonpi.io/api/v0",
+  [ApiType.NORMAL]: "https://api.lemonpi.io",
 };
 
 // export const AUTH_TOKEN_LIFETIME = 60 * 15 * 1000; // 15 minutes
@@ -23,14 +23,11 @@ export default class ODCAuthClient implements AuthClient {
 
   private expiredAt = null;
 
-  constructor(private loginType: LoginType, private credentials: Credentials) {}
-
-  get apiUrl() {
-    return LoginTypes[this.loginType];
-  }
+  constructor(private credentials: Credentials) {}
 
   private async refreshAuth() {
     const authentication = await this.request(
+      ApiType.NORMAL,
       "/auth/refresh-user-token",
       "POST",
       {
@@ -51,6 +48,7 @@ export default class ODCAuthClient implements AuthClient {
     }
 
     const response = await this.request(
+      ApiType.NORMAL,
       "/auth/user-token",
       "POST",
       {
@@ -88,6 +86,7 @@ export default class ODCAuthClient implements AuthClient {
   }
 
   private async request(
+    apiType: ApiType,
     path: string,
     method: "GET" | "POST" | "PUT",
     data?: any,
@@ -97,7 +96,7 @@ export default class ODCAuthClient implements AuthClient {
       await this.authenticate();
     }
 
-    return axios(`${this.apiUrl}${path}`, {
+    return axios(`${ApiTypes[apiType]}${path}`, {
       method,
       data: data && method !== "GET" ? data : undefined,
       headers: {
@@ -108,15 +107,15 @@ export default class ODCAuthClient implements AuthClient {
     });
   }
 
-  async get(path) {
-    return this.request(path, "GET");
+  async get(apiType: ApiType, path: string) {
+    return this.request(apiType, path, "GET");
   }
 
-  async post(path, data) {
-    return this.request(path, "POST", data);
+  async post(apiType: ApiType, path: string, data) {
+    return this.request(apiType, path, "POST", data);
   }
 
-  async put(path, data) {
-    return this.request(path, "PUT", data);
+  async put(apiType: ApiType, path: string, data) {
+    return this.request(apiType, path, "PUT", data);
   }
 }
