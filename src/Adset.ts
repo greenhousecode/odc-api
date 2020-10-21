@@ -1,12 +1,5 @@
 import ODC, { ApiType } from "./ODCAuthClient";
 
-type Predicate = true | ["=", string, string];
-
-interface Assignment {
-  expr: string;
-  name: string;
-}
-
 interface ContextRule {
   assignment: Assignment;
   predicate: Predicate;
