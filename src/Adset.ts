@@ -1,4 +1,4 @@
-import ODC from "./ODCAuthClient";
+import ODC, { ApiType } from "./ODCAuthClient";
 
 type Predicate = true | ["=", string, string];
 
@@ -7,47 +7,88 @@ interface Assignment {
   name: string;
 }
 
-interface Rule {
+interface ContextRule {
   assignment: Assignment;
   predicate: Predicate;
 }
 
-interface ContentSettings {
+interface Placeholder {
+  type: "text" | "number" | "video" | "image";
+  name: string;
+}
+
+interface Content {
   id?: string;
-  rules: Rule[];
+  meta: {
+    "advertiser-id": number;
+    schema: string;
+  };
+  data: {
+    rules: ContextRule[];
+    placeholders: Placeholder[];
+  };
+}
+
+function hasCorrectContentFormat(
+  toBeDetermined: any
+): toBeDetermined is Content {
+  if (toBeDetermined as Content) {
+    return true;
+  }
+  return false;
 }
 
 export default class Adset {
-  constructor(private client: ODC, private adsetId: number) {}
+  public content: Content;
 
-  async getContent() {
-    return this.client.get(
+  public synced;
+
+  constructor(private client: ODC, private adsetId: number) {
+    this.synced = this.sync();
+  }
+
+  private async getContent() {
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
       `/adsets-2/${this.adsetId}/content-function?stage=draft`
     );
+
+    return data;
   }
 
-  async updateContent(content: ContentSettings) {
-    const response = await this.getContent();
-    console.log(response);
+  private async updateContent(content: Content) {
+    const formData = new FormData();
+    formData.append("json", JSON.stringify(content));
 
-    // const { data, meta } = response;
-    // const formData = new FormData();
+    const response = this.client.put(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function?stage=draft`,
+      formData
+    );
 
-    // formData.append(
-    //   "json",
-    //   JSON.stringify({
-    //     meta,
-    //     data: {
-    //       rules: settings.rules,
-    //       context: [{ alias: "custom" }],
-    //       placeholders: data.placeholders
-    //     }
-    //   })
-    // );
-
-    // return this.client.put(
-    //   `/adsets-2/${adsetId}/content-function?stage=draft`,
-    //   formData
-    // );
+    await this.sync();
+    return response;
   }
+
+  async sync() {
+    this.content = await this.getContent();
+  }
+
+  async save() {
+    if (!hasCorrectContentFormat(this.content)) {
+      throw new Error(
+        "Cannot update Adset content, as the format of the content is incorrect."
+      );
+    }
+
+    return this.updateContent(this.content);
+  }
+
+  async addContextRule(rule: ContextRule) {}
+
+  async removeContextRule(rule: ContextRule) {}
+
+  async addPlaceholder(placeholder: Placeholder) {}
+
+  async removePlaceholder(placeholder: Placeholder) {}
 }
