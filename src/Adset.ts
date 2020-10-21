@@ -1,7 +1,8 @@
+import FormData from "form-data";
 import ODC, { ApiType } from "./ODCAuthClient";
 
 interface ContextRule {
-  assignment: Assignment;
+  assignments: Assignment[];
   predicate: Predicate;
 }
 
@@ -77,11 +78,28 @@ export default class Adset {
     return this.updateContent(this.content);
   }
 
-  async addContextRule(rule: ContextRule) {}
+  addContextRule(rule: ContextRule) {
+    this.content.data.rules.push(rule);
+  }
 
-  async removeContextRule(rule: ContextRule) {}
+  removeContextRule(rule: ContextRule) {
+    const index = this.content.data.rules.findIndex(
+      (contextRule) =>
+        JSON.stringify(contextRule.predicate) === JSON.stringify(rule.predicate)
+    );
 
-  async addPlaceholder(placeholder: Placeholder) {}
+    this.content.data.rules.splice(index, 1);
+  }
 
-  async removePlaceholder(placeholder: Placeholder) {}
+  addPlaceholder(placeholder: Placeholder) {
+    this.content.data.placeholders.push(placeholder);
+  }
+
+  removePlaceholder(placeholder: Placeholder) {
+    const index = this.content.data.placeholders.findIndex(
+      (item) => item.name === placeholder.name && item.type === placeholder.type
+    );
+
+    this.content.data.placeholders.splice(index, 1);
+  }
 }
