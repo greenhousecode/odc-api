@@ -32,11 +32,7 @@ function hasCorrectContentFormat(
 export default class Adset {
   public content: Content;
 
-  public synced;
-
-  constructor(private client: ODC, private adsetId: number) {
-    this.synced = this.sync();
-  }
+  constructor(private client: ODC, private adsetId: number) {}
 
   private async getContent() {
     const { data } = await this.client.get(
@@ -57,11 +53,10 @@ export default class Adset {
       formData
     );
 
-    await this.sync();
     return response;
   }
 
-  async sync() {
+  async syncFromODC() {
     this.content = await this.getContent();
   }
 

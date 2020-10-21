@@ -66,19 +66,19 @@ export default class ODCAuthClient implements AuthClient {
   async authenticate() {
     if (
       this.authentication &&
-      typeof this.authentication.token !== "undefined"
+      typeof this.authentication["auth-token"] !== "undefined"
     ) {
       if (Date.now() >= this.expiredAt) {
         try {
           await this.refreshAuth();
-          return this.authentication.token;
+          return this.authentication["auth-token"];
         } catch (e) {
           this.authentication = null;
           return this.authenticate();
         }
       }
 
-      return this.authentication.token;
+      return this.authentication["auth-token"];
     }
 
     await this.createAuth();
@@ -96,8 +96,6 @@ export default class ODCAuthClient implements AuthClient {
     if (refreshAuth) {
       await this.authenticate();
     }
-
-    console.log(path, method, data);
 
     return axios(`${ApiTypes[apiType]}${path}`, {
       method,
