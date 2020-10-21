@@ -26,10 +26,7 @@ interface Content {
 function hasCorrectContentFormat(
   toBeDetermined: any
 ): toBeDetermined is Content {
-  if (toBeDetermined as Content) {
-    return true;
-  }
-  return false;
+  return !!(toBeDetermined as Content);
 }
 
 export default class Adset {

@@ -97,7 +97,7 @@ export default class ODCAuthClient implements AuthClient {
       await this.authenticate();
     }
 
-    console.log(path, data);
+    console.log(path, method, data);
 
     return axios(`${ApiTypes[apiType]}${path}`, {
       method,

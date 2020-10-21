@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "typeRoots": ["./types/*.d.ts"],
     "types": ["node", "./types"],
     "outDir": "./dist",
-    "emitDeclarationOnly": true,
-    "declaration": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "target": "ES5",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true,
+    "declaration": true
   },
   "include": ["./src"]
 }
