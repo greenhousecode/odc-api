@@ -1,4 +1,5 @@
 import axios from "axios";
+import FormData from "form-data";
 
 interface Credentials {
   email: string;
@@ -89,12 +90,14 @@ export default class ODCAuthClient implements AuthClient {
     apiType: ApiType,
     path: string,
     method: "GET" | "POST" | "PUT",
-    data?: any,
+    data?: FormData | any,
     refreshAuth = true
   ) {
     if (refreshAuth) {
       await this.authenticate();
     }
+
+    console.log(path, data);
 
     return axios(`${ApiTypes[apiType]}${path}`, {
       method,
@@ -102,6 +105,9 @@ export default class ODCAuthClient implements AuthClient {
       headers: {
         ...(this.authentication
           ? { Authorization: `lemonpi ${this.authentication["auth-token"]}` }
+          : {}),
+        ...(data instanceof FormData
+          ? { "Content-Type": "multipart/form-data" }
           : {}),
       },
     });
