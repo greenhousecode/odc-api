@@ -5,3 +5,8 @@ interface AuthClient {
 type AuthToken = AuthClient | string;
 
 type Predicate = true | ["=", string, string];
+
+interface Entity {
+  syncContent(): Promise<void>;
+  saveChanges(): Promise<void>;
+}

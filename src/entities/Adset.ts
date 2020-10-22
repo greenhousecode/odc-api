@@ -1,26 +1,26 @@
 import FormData from "form-data";
-import ODC, { ApiType } from "./ODCAuthClient";
+import ODC, { ApiType } from "../ODCAuthClient";
 
-interface Assignment {
+export interface Assignment {
   expr: string;
   name: string;
 }
 
-interface ContextRule {
+export interface ContextRule {
   assignments: Assignment[];
   predicate: Predicate;
 }
 
-interface Placeholder {
+export interface Placeholder {
   type: "text" | "number" | "click" | "audio" | "video" | "image";
   name: string;
 }
 
-interface Context {
+export interface Context {
   alias: "custom";
 }
 
-interface Content {
+export interface Content {
   meta: {
     "advertiser-id": number;
     schema: "urn:lemonpi:schema:content-function:rules:v1";
@@ -32,27 +32,28 @@ interface Content {
   };
 }
 
+// doesnt work yet..
 function hasCorrectContentFormat(
   toBeDetermined: any
 ): toBeDetermined is Content {
   return !!(toBeDetermined as Content);
 }
 
-export default class Adset {
+export default class Adset implements Entity {
   public content: Content;
 
   constructor(private client: ODC, private adsetId: number) {}
 
-  private async getContent() {
+  private async getContent(stage: "draft" | "published") {
     const { data } = await this.client.get(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=draft`
+      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
     );
 
     return data;
   }
 
-  async get() {
+  async getOverview() {
     const { data: adset } = await this.client.get(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}`
@@ -73,7 +74,6 @@ export default class Adset {
 
   async syncContent() {
     this.content = await this.getContent();
-    return this.content;
   }
 
   async saveChanges() {
@@ -86,13 +86,11 @@ export default class Adset {
     const formData = new FormData();
     formData.append("json", JSON.stringify(this.content));
 
-    const response = await this.client.put(
+    await this.client.put(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}/content-function?stage=draft`,
       formData
     );
-
-    return response;
   }
 
   addContextRule(rule: ContextRule) {
