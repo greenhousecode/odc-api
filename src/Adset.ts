@@ -11,13 +11,17 @@ interface Placeholder {
   name: string;
 }
 
+interface Context {
+  alias: "custom";
+}
+
 interface Content {
-  id?: string;
   meta: {
     "advertiser-id": number;
-    schema: string;
+    schema: "urn:lemonpi:schema:content-function:rules:v1";
   };
   data: {
+    context: Context[];
     rules: ContextRule[];
     placeholders: Placeholder[];
   };
@@ -43,31 +47,47 @@ export default class Adset {
     return data;
   }
 
-  private async updateContent(content: Content) {
-    const formData = new FormData();
-    formData.append("json", JSON.stringify(content));
+  async get() {
+    const { data: adset } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}`
+    );
+    return adset;
+  }
 
-    const response = this.client.put(
+  async getContentVariants() {
+    const {
+      data: { items },
+    } = await this.client.post(
+      ApiType.LEGACY,
+      `/content-functions/adset/${this.adsetId}/variants`,
+      null
+    );
+    return items;
+  }
+
+  async syncContent() {
+    this.content = await this.getContent();
+    return this.content;
+  }
+
+  async saveChanges() {
+    if (!hasCorrectContentFormat(this.content)) {
+      throw new Error(
+        "Cannot save Adset content, as the format of the content is incorrect."
+      );
+    }
+
+    const formData = new FormData();
+    formData.append("json", JSON.stringify(this.content));
+
+    const response = await this.client.put(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}/content-function?stage=draft`,
       formData
     );
 
     return response;
-  }
-
-  async syncFromODC() {
-    this.content = await this.getContent();
-  }
-
-  async save() {
-    if (!hasCorrectContentFormat(this.content)) {
-      throw new Error(
-        "Cannot update Adset content, as the format of the content is incorrect."
-      );
-    }
-
-    return this.updateContent(this.content);
   }
 
   addContextRule(rule: ContextRule) {
