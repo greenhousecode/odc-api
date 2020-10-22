@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import ODCAuthClient from "./ODCAuthClient";
 
 export * from "./ODCAuthClient";
