@@ -7,7 +7,7 @@ interface ContextRule {
 }
 
 interface Placeholder {
-  type: "text" | "number" | "video" | "image";
+  type: "text" | "number" | "click" | "audio" | "video" | "image";
   name: string;
 }
 
@@ -94,24 +94,12 @@ export default class Adset {
     this.content.data.rules.push(rule);
   }
 
-  removeContextRule(rule: ContextRule) {
+  removeContextRuleByPredicate(predicate: Predicate) {
     const index = this.content.data.rules.findIndex(
       (contextRule) =>
-        JSON.stringify(contextRule.predicate) === JSON.stringify(rule.predicate)
+        JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
     );
 
-    this.content.data.rules.splice(index, 1);
-  }
-
-  addPlaceholder(placeholder: Placeholder) {
-    this.content.data.placeholders.push(placeholder);
-  }
-
-  removePlaceholder(placeholder: Placeholder) {
-    const index = this.content.data.placeholders.findIndex(
-      (item) => item.name === placeholder.name && item.type === placeholder.type
-    );
-
-    this.content.data.placeholders.splice(index, 1);
+    return this.content.data.rules.splice(index, 1);
   }
 }
