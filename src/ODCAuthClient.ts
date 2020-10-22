@@ -19,11 +19,6 @@ const ApiTypes = {
 // export const AUTH_TOKEN_LIFETIME = 60 * 15 * 1000; // 15 minutes
 export const AUTH_TOKEN_LIFETIME = 1000;
 
-// axios.interceptors.request.use((request) => {
-//   console.log("Starting Request", JSON.stringify(request, null, 2));
-//   return request;
-// });
-
 export default class ODCAuthClient implements AuthClient {
   private authentication = null;
 
@@ -108,6 +103,7 @@ export default class ODCAuthClient implements AuthClient {
         ...(this.authentication
           ? { Authorization: `lemonpi ${this.authentication["auth-token"]}` }
           : {}),
+        ...(data instanceof FormData ? { ...data.getHeaders() } : {}),
       },
     });
   }
