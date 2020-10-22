@@ -4,7 +4,7 @@
   "description": "API that simplifies working with the WPP ODC platform",
   "scripts": {
     "dev": "rollup -cw",
-    "build": "ENV=PRODUCTION rollup -c",
+    "build": "rollup -c",
     "lint": "eslint  --ignore-path .gitignore '*/**/*.{js,ts,json}' --quiet --fix",
     "format": "prettier --ignore-path .gitignore --check '**/*.{js,ts,json}'"
   },

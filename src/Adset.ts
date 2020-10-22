@@ -1,6 +1,11 @@
 import FormData from "form-data";
 import ODC, { ApiType } from "./ODCAuthClient";
 
+interface Assignment {
+  expr: string;
+  name: string;
+}
+
 interface ContextRule {
   assignments: Assignment[];
   predicate: Predicate;

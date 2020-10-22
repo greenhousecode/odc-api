@@ -5,8 +5,3 @@ interface AuthClient {
 type AuthToken = AuthClient | string;
 
 type Predicate = true | ["=", string, string];
-
-interface Assignment {
-  expr: string;
-  name: string;
-}
