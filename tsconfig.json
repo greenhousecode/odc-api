@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "typeRoots": ["./types/*.d.ts"],
+    "types": ["node", "./types"],
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "target": "ES5",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true,
+    "declaration": true
+  },
+  "include": ["./src"]
+}

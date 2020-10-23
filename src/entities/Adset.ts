@@ -1,0 +1,108 @@
+import FormData from "form-data";
+import ODC, { ApiType } from "../ODCAuthClient";
+
+export interface Assignment {
+  expr: string;
+  name: string;
+}
+
+export interface ContextRule {
+  assignments: Assignment[];
+  predicate: Predicate;
+}
+
+export interface Placeholder {
+  type: "text" | "number" | "click" | "audio" | "video" | "image";
+  name: string;
+}
+
+export interface Context {
+  alias: "custom";
+}
+
+export interface Content {
+  meta: {
+    "advertiser-id": number;
+    schema: "urn:lemonpi:schema:content-function:rules:v1";
+  };
+  data: {
+    context: Context[];
+    rules: ContextRule[];
+    placeholders: Placeholder[];
+  };
+}
+
+// doesnt work yet..
+function hasCorrectContentFormat(
+  toBeDetermined: any
+): toBeDetermined is Content {
+  return !!(toBeDetermined as Content);
+}
+
+export default class Adset implements Entity {
+  public content: Content;
+
+  constructor(private client: ODC, private adsetId: number) {}
+
+  private async getContent(stage: "draft" | "published") {
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
+    );
+
+    return data;
+  }
+
+  async getOverview() {
+    const { data: adset } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}`
+    );
+    return adset;
+  }
+
+  async getContentVariants() {
+    const {
+      data: { items },
+    } = await this.client.post(
+      ApiType.LEGACY,
+      `/content-functions/adset/${this.adsetId}/variants`,
+      null
+    );
+    return items;
+  }
+
+  async syncContent() {
+    this.content = await this.getContent();
+  }
+
+  async saveChanges() {
+    if (!hasCorrectContentFormat(this.content)) {
+      throw new Error(
+        "Cannot save Adset content, as the format of the content is incorrect."
+      );
+    }
+
+    const formData = new FormData();
+    formData.append("json", JSON.stringify(this.content));
+
+    await this.client.put(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function?stage=draft`,
+      formData
+    );
+  }
+
+  addContextRule(rule: ContextRule) {
+    this.content.data.rules.push(rule);
+  }
+
+  removeContextRuleByPredicate(predicate: Predicate) {
+    const index = this.content.data.rules.findIndex(
+      (contextRule) =>
+        JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
+    );
+
+    return this.content.data.rules.splice(index, 1);
+  }
+}
