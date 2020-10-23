@@ -19,13 +19,20 @@ export default class AdsetService {
   }
 
   removeContextRuleByPredicate(adsetId: number, predicate: Predicate) {
-    const index = this.content.data.rules.findIndex(
-      (contextRule) =>
-        JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
-    );
-
-    return this.content.data.rules.splice(index, 1);
+    return this.removeContextRulesByPredicates(adsetId, [predicate]);
   }
 
-  removeContextRulesByPredicates(adsetId: number, predicates: Predicate[]) {}
+  async removeContextRulesByPredicates(
+    adsetId: number,
+    predicates: Predicate[]
+  ) {
+    const adset = new Adset(this.client, adsetId);
+    await adset.syncContent();
+
+    predicates.forEach((predicate) =>
+      adset.removeContextRuleByPredicate(predicate)
+    );
+
+    await adset.saveChanges();
+  }
 }
