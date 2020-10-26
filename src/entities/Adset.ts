@@ -14,6 +14,7 @@ export interface ContextRule {
 export interface Placeholder {
   type: "text" | "click" | "audio" | "video" | "image";
   name: string;
+  defaultValue?: string;
 }
 
 export interface Context {
@@ -106,21 +107,36 @@ export default class Adset implements Entity {
     return this.content.data.rules.splice(index, 1);
   }
 
-  addPlaceholder(placeholder: Placeholder, value: string) {
+  addPlaceholder(placeholder: Placeholder) {
+    if (!placeholder.defaultValue) {
+      throw new Error("Cannot add placeholder without a value!");
+    }
+
+    const { defaultValue } = placeholder;
+
+    // eslint-disable-next-line no-param-reassign
+    delete placeholder.defaultValue;
+
     this.content.data.placeholders.push(placeholder);
 
     this.content.data.rules[0].assignments.push({
-      expr: value,
+      expr: defaultValue,
       name: placeholder.name,
     });
   }
 
   removePlaceholder(placeholder: Placeholder) {
-    const index = this.content.data.placeholders.findIndex(
+    const placeholderIndex = this.content.data.placeholders.findIndex(
       (item) => item.name === placeholder.name && item.type === placeholder.type
     );
 
-    this.content.data.placeholders.splice(index, 1);
+    this.content.data.placeholders.splice(placeholderIndex, 1);
+
+    const assignmentIndex = this.content.data.rules[0].assignments.findIndex(
+      (item) => item.name === placeholder.name
+    );
+
+    this.content.data.rules[0].assignments.splice(assignmentIndex, 1);
   }
 
   hasPlaceholder(placeholder: Placeholder) {
