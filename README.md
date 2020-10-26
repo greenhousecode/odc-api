@@ -73,5 +73,5 @@ Usage:
 
 ```js
 const adsetService = new AdsetService(odcClient <ODCAuthClient>);
-adsetService.addContextRules(adsetId: <Number>, rules: <ContextRule[]>);
+await adsetService.addContextRules(adsetId: <Number>, rules: <ContextRule[]>);
 ```

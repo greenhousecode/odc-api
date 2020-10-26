@@ -1,6 +1,11 @@
 import ODC from "../ODCAuthClient";
 
-import Adset, { ContextRule, Placeholder, Content } from "../entities/Adset";
+import Adset, {
+  ContextRule,
+  Placeholder,
+  Content,
+  ContentStage,
+} from "../entities/Adset";
 
 export default class AdsetService {
   public content: Content;
@@ -20,10 +25,10 @@ export default class AdsetService {
     rules: ContextRule[],
     stage: ContentStage = "draft"
   ) {
-    const adset = new Adset(this.client, adsetId);
-    await adset.syncContent(stage);
+    const adset = new Adset(this.client, adsetId, stage);
+    await adset.syncContent();
     rules.forEach((rule) => adset.addContextRule(rule));
-    await adset.saveChanges(stage);
+    await adset.saveChanges();
   }
 
   removeContextRuleByPredicate(
@@ -39,14 +44,14 @@ export default class AdsetService {
     predicates: Predicate[],
     stage: ContentStage = "draft"
   ) {
-    const adset = new Adset(this.client, adsetId);
-    await adset.syncContent(stage);
+    const adset = new Adset(this.client, adsetId, stage);
+    await adset.syncContent();
 
     predicates.forEach((predicate) =>
       adset.removeContextRuleByPredicate(predicate)
     );
 
-    await adset.saveChanges(stage);
+    await adset.saveChanges();
   }
 
   addPlaceholder(
@@ -62,9 +67,9 @@ export default class AdsetService {
     placeholders: Placeholder[],
     stage: ContentStage = "draft"
   ) {
-    const adset = new Adset(this.client, adsetId);
-    await adset.syncContent(stage);
+    const adset = new Adset(this.client, adsetId, stage);
+    await adset.syncContent();
     placeholders.forEach((placeholder) => adset.addPlaceholder(placeholder));
-    await adset.saveChanges(stage);
+    await adset.saveChanges();
   }
 }

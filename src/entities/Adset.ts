@@ -33,6 +33,8 @@ export interface Content {
   };
 }
 
+export type ContentStage = "draft" | "published";
+
 // doesnt work yet..
 function hasCorrectContentFormat(
   toBeDetermined: any
@@ -43,12 +45,16 @@ function hasCorrectContentFormat(
 export default class Adset implements Entity {
   public content: Content;
 
-  constructor(private client: ODC, private adsetId: number) {}
+  constructor(
+    private client: ODC,
+    private adsetId: number,
+    private stage: ContentStage
+  ) {}
 
-  private async getContent(stage: ContentStage) {
+  private async getContent() {
     const { data } = await this.client.get(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
+      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`
     );
 
     return data;
@@ -73,11 +79,11 @@ export default class Adset implements Entity {
     return items;
   }
 
-  async syncContent(stage: ContentStage) {
-    this.content = await this.getContent(stage);
+  async syncContent() {
+    this.content = await this.getContent();
   }
 
-  async saveChanges(stage: ContentStage) {
+  async saveChanges() {
     if (!hasCorrectContentFormat(this.content)) {
       throw new Error(
         "Cannot save Adset content, as the format of the content is incorrect."
@@ -89,7 +95,7 @@ export default class Adset implements Entity {
 
     await this.client.put(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`,
+      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`,
       formData
     );
   }
