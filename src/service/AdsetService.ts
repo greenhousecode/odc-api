@@ -7,8 +7,12 @@ export default class AdsetService {
 
   constructor(private client: ODC) {}
 
-  addContextRule(adsetId: number, rule: ContextRule) {
-    return this.addContextRules(adsetId, [rule]);
+  addContextRule(
+    adsetId: number,
+    rule: ContextRule,
+    stage: ContentStage = "draft"
+  ) {
+    return this.addContextRules(adsetId, [rule], stage);
   }
 
   async addContextRules(
@@ -22,16 +26,21 @@ export default class AdsetService {
     await adset.saveChanges();
   }
 
-  removeContextRuleByPredicate(adsetId: number, predicate: Predicate) {
-    return this.removeContextRulesByPredicates(adsetId, [predicate]);
+  removeContextRuleByPredicate(
+    adsetId: number,
+    predicate: Predicate,
+    stage: ContentStage = "draft"
+  ) {
+    return this.removeContextRulesByPredicates(adsetId, [predicate], stage);
   }
 
   async removeContextRulesByPredicates(
     adsetId: number,
-    predicates: Predicate[]
+    predicates: Predicate[],
+    stage: ContentStage = "draft"
   ) {
     const adset = new Adset(this.client, adsetId);
-    await adset.syncContent();
+    await adset.syncContent(stage);
 
     predicates.forEach((predicate) =>
       adset.removeContextRuleByPredicate(predicate)
