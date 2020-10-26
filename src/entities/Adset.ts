@@ -12,7 +12,7 @@ export interface ContextRule {
 }
 
 export interface Placeholder {
-  type: "text" | "number" | "click" | "audio" | "video" | "image";
+  type: "text" | "click" | "audio" | "video" | "image";
   name: string;
 }
 
@@ -106,8 +106,13 @@ export default class Adset implements Entity {
     return this.content.data.rules.splice(index, 1);
   }
 
-  addPlaceholder(placeholder: Placeholder) {
+  addPlaceholder(placeholder: Placeholder, value: string) {
     this.content.data.placeholders.push(placeholder);
+
+    this.content.data.rules[0].assignments.push({
+      expr: value,
+      name: placeholder.name,
+    });
   }
 
   removePlaceholder(placeholder: Placeholder) {
