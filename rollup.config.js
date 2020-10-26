@@ -24,7 +24,9 @@ export default {
       rollupCommonJSResolveHack: true,
       clean: true,
     }),
-    commonjs(),
+    commonjs({
+      include: ["./src/**"],
+    }),
     json(),
   ],
 };

@@ -12,8 +12,9 @@ export interface ContextRule {
 }
 
 export interface Placeholder {
-  type: "text" | "number" | "click" | "audio" | "video" | "image";
+  type: "text" | "click" | "audio" | "video" | "image";
   name: string;
+  defaultValue?: string;
 }
 
 export interface Context {
@@ -32,6 +33,8 @@ export interface Content {
   };
 }
 
+export type ContentStage = "draft" | "published";
+
 // doesnt work yet..
 function hasCorrectContentFormat(
   toBeDetermined: any
@@ -42,12 +45,16 @@ function hasCorrectContentFormat(
 export default class Adset implements Entity {
   public content: Content;
 
-  constructor(private client: ODC, private adsetId: number) {}
+  constructor(
+    private client: ODC,
+    private adsetId: number,
+    private stage: ContentStage
+  ) {}
 
-  private async getContent(stage: "draft" | "published") {
+  private async getContent() {
     const { data } = await this.client.get(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
+      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`
     );
 
     return data;
@@ -88,7 +95,7 @@ export default class Adset implements Entity {
 
     await this.client.put(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=draft`,
+      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`,
       formData
     );
   }
@@ -104,5 +111,46 @@ export default class Adset implements Entity {
     );
 
     return this.content.data.rules.splice(index, 1);
+  }
+
+  addPlaceholder(placeholder: Placeholder) {
+    if (!placeholder.defaultValue) {
+      throw new Error("Cannot add placeholder without a default value!");
+    }
+
+    const { defaultValue } = placeholder;
+
+    // eslint-disable-next-line no-param-reassign
+    delete placeholder.defaultValue;
+
+    this.content.data.placeholders.push(placeholder);
+
+    this.content.data.rules[0].assignments.push({
+      expr: defaultValue,
+      name: placeholder.name,
+    });
+  }
+
+  removePlaceholder(placeholder: Placeholder) {
+    const placeholderIndex = this.content.data.placeholders.findIndex(
+      (item) => item.name === placeholder.name && item.type === placeholder.type
+    );
+
+    this.content.data.placeholders.splice(placeholderIndex, 1);
+
+    const assignmentIndex = this.content.data.rules[0].assignments.findIndex(
+      (item) => item.name === placeholder.name
+    );
+
+    this.content.data.rules[0].assignments.splice(assignmentIndex, 1);
+  }
+
+  hasPlaceholder(placeholder: Placeholder) {
+    return this.content.data.placeholders.reduce((bool, item) => {
+      return (
+        bool ||
+        (item.name === placeholder.name && item.type === placeholder.type)
+      );
+    }, false);
   }
 }
