@@ -109,7 +109,7 @@ export default class Adset implements Entity {
 
   addPlaceholder(placeholder: Placeholder) {
     if (!placeholder.defaultValue) {
-      throw new Error("Cannot add placeholder without a value!");
+      throw new Error("Cannot add placeholder without a default value!");
     }
 
     const { defaultValue } = placeholder;
