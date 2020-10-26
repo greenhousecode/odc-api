@@ -76,7 +76,7 @@ export default class Adset implements Entity {
     this.content = await this.getContent(stage);
   }
 
-  async saveChanges() {
+  async saveChanges(stage: ContentStage) {
     if (!hasCorrectContentFormat(this.content)) {
       throw new Error(
         "Cannot save Adset content, as the format of the content is incorrect."
@@ -88,7 +88,7 @@ export default class Adset implements Entity {
 
     await this.client.put(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=draft`,
+      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`,
       formData
     );
   }

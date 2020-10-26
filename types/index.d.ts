@@ -10,5 +10,5 @@ type Predicate = true | ["=", string, string];
 
 interface Entity {
   syncContent(content: ContentStage): Promise<void>;
-  saveChanges(): Promise<void>;
+  saveChanges(content: ContentStage): Promise<void>;
 }
