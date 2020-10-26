@@ -44,7 +44,7 @@ export default class Adset implements Entity {
 
   constructor(private client: ODC, private adsetId: number) {}
 
-  private async getContent(stage: "draft" | "published") {
+  private async getContent(stage: ContentStage) {
     const { data } = await this.client.get(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
@@ -72,8 +72,8 @@ export default class Adset implements Entity {
     return items;
   }
 
-  async syncContent() {
-    this.content = await this.getContent();
+  async syncContent(stage: ContentStage) {
+    this.content = await this.getContent(stage);
   }
 
   async saveChanges() {
@@ -104,5 +104,26 @@ export default class Adset implements Entity {
     );
 
     return this.content.data.rules.splice(index, 1);
+  }
+
+  addPlaceholder(placeholder: Placeholder) {
+    this.content.data.placeholders.push(placeholder);
+  }
+
+  removePlaceholder(placeholder: Placeholder) {
+    const index = this.content.data.placeholders.findIndex(
+      (item) => item.name === placeholder.name && item.type === placeholder.type
+    );
+
+    this.content.data.placeholders.splice(index, 1);
+  }
+
+  hasPlaceholder(placeholder: Placeholder) {
+    return this.content.data.placeholders.reduce((bool, item) => {
+      return (
+        bool ||
+        (item.name === placeholder.name && item.type === placeholder.type)
+      );
+    }, false);
   }
 }
