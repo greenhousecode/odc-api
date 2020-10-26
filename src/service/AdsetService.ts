@@ -11,9 +11,13 @@ export default class AdsetService {
     return this.addContextRules(adsetId, [rule]);
   }
 
-  async addContextRules(adsetId: number, rules: ContextRule[]) {
+  async addContextRules(
+    adsetId: number,
+    rules: ContextRule[],
+    stage: ContentStage = "draft"
+  ) {
     const adset = new Adset(this.client, adsetId);
-    await adset.syncContent();
+    await adset.syncContent(stage);
     rules.forEach((rule) => adset.addContextRule(rule));
     await adset.saveChanges();
   }
