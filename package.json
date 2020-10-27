@@ -1,6 +1,6 @@
 {
   "name": "odc-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "API that simplifies working with the WPP ODC platform",
   "scripts": {
     "dev": "rollup -cw",
@@ -14,6 +14,7 @@
   ],
   "author": "MEH <meh@greenhousegroup.com>",
   "license": "ISC",
+  "prepublish": "npm run build",
   "lint-staged": {
     "*.js": [
       "yarn lint --fix",
