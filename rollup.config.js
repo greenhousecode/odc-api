@@ -1,7 +1,7 @@
 import typescript from 'rollup-plugin-typescript2';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import json from 'rollup-plugin-json';
+import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 import external from '@yelo/rollup-node-external';
 
 import pkg from './package.json';
@@ -17,21 +17,28 @@ export default {
     {
       file: pkg.module,
       format: 'es',
+      sourcemap: true,
+    },
+    {
+      file: pkg.browser,
+      format: 'iife',
+      sourcemap: true,
     },
   ],
   external: external(),
   treeshake: true,
   plugins: [
-    resolve({
+    nodeResolve({
       browser: true,
       preferBuiltins: true,
     }),
     typescript({
       rollupCommonJSResolveHack: true,
       clean: true,
+      exclude: '**/__tests__/**',
     }),
     commonjs({
-      include: ['./src/**'],
+      include: ['node_modules/**'],
     }),
     json(),
   ],
