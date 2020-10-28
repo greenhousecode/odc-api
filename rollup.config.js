@@ -1,22 +1,22 @@
-import typescript from "rollup-plugin-typescript2";
-import commonjs from "rollup-plugin-commonjs";
-import resolve from "rollup-plugin-node-resolve";
-import json from "rollup-plugin-json";
-import external from "@yelo/rollup-node-external";
+import typescript from 'rollup-plugin-typescript2';
+import commonjs from 'rollup-plugin-commonjs';
+import resolve from 'rollup-plugin-node-resolve';
+import json from 'rollup-plugin-json';
+import external from '@yelo/rollup-node-external';
 
-import pkg from "./package.json";
+import pkg from './package.json';
 
 export default {
-  input: "./src/index.ts",
+  input: './src/index.ts',
   output: [
     {
       file: pkg.main,
-      format: "cjs",
+      format: 'cjs',
       sourcemap: true,
     },
     {
       file: pkg.module,
-      format: "es",
+      format: 'es',
     },
   ],
   external: external(),
@@ -31,7 +31,7 @@ export default {
       clean: true,
     }),
     commonjs({
-      include: ["./src/**"],
+      include: ['./src/**'],
     }),
     json(),
   ],

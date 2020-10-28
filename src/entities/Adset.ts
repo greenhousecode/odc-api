@@ -1,5 +1,5 @@
-import FormData from "form-data";
-import ODC, { ApiType } from "../ODCAuthClient";
+import FormData from 'form-data';
+import ODC, { ApiType } from '../ODCAuthClient';
 
 export interface Assignment {
   expr: string;
@@ -12,19 +12,19 @@ export interface ContextRule {
 }
 
 export interface Placeholder {
-  type: "text" | "click" | "audio" | "video" | "image";
+  type: 'text' | 'click' | 'audio' | 'video' | 'image';
   name: string;
   defaultValue?: string;
 }
 
 export interface Context {
-  alias: "custom";
+  alias: 'custom';
 }
 
 export interface Content {
   meta: {
-    "advertiser-id": number;
-    schema: "urn:lemonpi:schema:content-function:rules:v1";
+    'advertiser-id': number;
+    schema: 'urn:lemonpi:schema:content-function:rules:v1';
   };
   data: {
     context: Context[];
@@ -33,7 +33,7 @@ export interface Content {
   };
 }
 
-export type ContentStage = "draft" | "published";
+export type ContentStage = 'draft' | 'published';
 
 // doesnt work yet..
 function hasCorrectContentFormat(
@@ -86,12 +86,12 @@ export default class Adset implements Entity {
   async saveChanges() {
     if (!hasCorrectContentFormat(this.content)) {
       throw new Error(
-        "Cannot save Adset content, as the format of the content is incorrect."
+        'Cannot save Adset content, as the format of the content is incorrect.'
       );
     }
 
     const formData = new FormData();
-    formData.append("json", JSON.stringify(this.content));
+    formData.append('json', JSON.stringify(this.content));
 
     await this.client.put(
       ApiType.LEGACY,
@@ -115,7 +115,7 @@ export default class Adset implements Entity {
 
   addPlaceholder(placeholder: Placeholder) {
     if (!placeholder.defaultValue) {
-      throw new Error("Cannot add placeholder without a default value!");
+      throw new Error('Cannot add placeholder without a default value!');
     }
 
     const { defaultValue } = placeholder;
