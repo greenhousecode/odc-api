@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "module": "es6",
     "typeRoots": ["./types/*.d.ts"],
     "types": ["node", "./types"],
     "moduleResolution": "node",
     "target": "ES5",
     "outDir": "./dist",
     "declarationDir": "./dist",
+    "lib": ["ESNext", "DOM"],
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": true
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["./src/**/*"]
 }
