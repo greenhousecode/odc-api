@@ -1,10 +1,10 @@
-const create = (field: string, operator: "=", value: string) =>
+const create = (field: string, operator: '=', value: string) =>
   [operator, `\${custom.${field}}`, value] as Predicate;
 
 const toHumanReadable = (predicate: Predicate) =>
-  typeof predicate === "boolean"
+  typeof predicate === 'boolean'
     ? `${predicate}`
-    : `${predicate[1].replace("${custom.", "").replace("}", "")} ${
+    : `${predicate[1].replace('${custom.', '').replace('}', '')} ${
         predicate[0]
       } ${predicate[2]}`;
 
