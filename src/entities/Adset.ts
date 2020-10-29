@@ -35,6 +35,8 @@ export interface Content {
 
 export type ContentStage = 'draft' | 'published';
 
+const EXPRESSION_VALUE_CHAR_LIMIT = 1024;
+
 // doesnt work yet..
 function hasCorrectContentFormat(
   toBeDetermined: any
@@ -101,6 +103,18 @@ export default class Adset implements Entity {
   }
 
   addContextRule(rule: ContextRule) {
+    rule.assignments.forEach((assignment) => {
+      if (assignment.expr.length > EXPRESSION_VALUE_CHAR_LIMIT) {
+        throw new Error(
+          `Assignment expression exceeds ODC character limit (${EXPRESSION_VALUE_CHAR_LIMIT} characters). Have a look at this assignment: ${JSON.stringify(
+            assignment,
+            null,
+            2
+          )}`
+        );
+      }
+    });
+
     this.content.data.rules.push(rule);
   }
 
