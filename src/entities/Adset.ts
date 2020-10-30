@@ -118,13 +118,17 @@ export default class Adset implements Entity {
     this.content.data.rules.push(rule);
   }
 
-  removeContextRuleByPredicate(predicate: Predicate) {
+  removeContextRuleByPredicate(predicate: Predicate): ContextRule {
     const index = this.content.data.rules.findIndex(
       (contextRule) =>
         JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
     );
 
-    return this.content.data.rules.splice(index, 1);
+    if (index > -1) {
+      return this.content.data.rules.splice(index, 1)[0];
+    }
+
+    return null;
   }
 
   getContextRuleByPredicate(predicate: Predicate) {
@@ -154,18 +158,22 @@ export default class Adset implements Entity {
     });
   }
 
-  removePlaceholder(placeholder: Placeholder) {
+  removePlaceholder(placeholder: Placeholder): Placeholder {
     const placeholderIndex = this.content.data.placeholders.findIndex(
       (item) => item.name === placeholder.name && item.type === placeholder.type
     );
 
-    this.content.data.placeholders.splice(placeholderIndex, 1);
+    if (placeholderIndex > -1) {
+      const assignmentIndex = this.content.data.rules[0].assignments.findIndex(
+        (item) => item.name === placeholder.name
+      );
 
-    const assignmentIndex = this.content.data.rules[0].assignments.findIndex(
-      (item) => item.name === placeholder.name
-    );
+      // remove assignments in defaults
+      this.content.data.rules[0].assignments.splice(assignmentIndex, 1);
+      return this.content.data.placeholders.splice(placeholderIndex, 1)[0];
+    }
 
-    this.content.data.rules[0].assignments.splice(assignmentIndex, 1);
+    return null;
   }
 
   hasPlaceholder(placeholder: Placeholder) {
