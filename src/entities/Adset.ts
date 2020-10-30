@@ -122,7 +122,7 @@ export default class Adset implements Entity {
     this.content.data.rules.push(rule);
   }
 
-  removeContextRuleByPredicate(predicate: Predicate): ContextRule {
+  removeContextRuleByPredicate(predicate: Predicate) {
     const index = this.content.data.rules.findIndex(
       (contextRule) =>
         JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
@@ -162,7 +162,7 @@ export default class Adset implements Entity {
     });
   }
 
-  removePlaceholder(placeholder: Placeholder): Placeholder {
+  removePlaceholder(placeholder: Placeholder) {
     const placeholderIndex = this.content.data.placeholders.findIndex(
       (item) => item.name === placeholder.name && item.type === placeholder.type
     );
