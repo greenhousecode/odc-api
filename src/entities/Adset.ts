@@ -127,6 +127,15 @@ export default class Adset implements Entity {
     return this.content.data.rules.splice(index, 1);
   }
 
+  getContextRuleByPredicate(predicate: Predicate) {
+    const rule = this.content.data.rules.find(
+      (contextRule) =>
+        JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
+    );
+
+    return rule;
+  }
+
   addPlaceholder(placeholder: Placeholder) {
     if (!placeholder.defaultValue) {
       throw new Error('Cannot add placeholder without a default value!');
