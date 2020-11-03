@@ -33,6 +33,26 @@ export interface Content {
   };
 }
 
+export interface Variant {
+  content: NestedSchemas;
+  context: NestedSchemas;
+}
+
+export interface VariantsConfig {
+  count: number;
+  items: Variant[];
+}
+
+export interface BuildVariant {
+  context: NestedSchemas;
+  'template-revision-id': number;
+}
+
+export interface BuildConfig {
+  type: 'video';
+  variants: BuildVariant[];
+}
+
 export type ContentStage = 'draft' | 'published';
 
 const EXPRESSION_VALUE_CHAR_LIMIT = 1024;
@@ -47,27 +67,23 @@ function hasCorrectContentFormat(
 export default class Adset implements Entity {
   public content: Content;
 
+  public variants: VariantsConfig;
+
+  public builds: BuildConfig[];
+
   constructor(
     private client: ODC,
     private adsetId: number,
     private stage: ContentStage
   ) {}
 
-  private async getContent() {
-    const { data } = await this.client.get(
-      ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`
-    );
-
-    return data;
-  }
-
   async getOverview() {
-    const { data: adset } = await this.client.get(
+    const { data } = await this.client.get(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}`
     );
-    return adset;
+
+    return data;
   }
 
   async getContentVariants() {
@@ -81,8 +97,22 @@ export default class Adset implements Entity {
     return items;
   }
 
+  async syncVariants() {
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-functions/published/variants`
+    );
+
+    this.variants = data;
+  }
+
   async syncContent() {
-    this.content = await this.getContent();
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`
+    );
+
+    this.content = data;
   }
 
   async saveChanges() {
@@ -101,6 +131,43 @@ export default class Adset implements Entity {
       formData
     );
   }
+
+  // Variants
+
+  getVariantByPredicate(predicate: Predicate | ComposedPredicate) {
+    if (!this.variants) {
+      throw new Error(
+        'Please sync your variants first by running "await <your-adset-instance>.syncVariants()"'
+      );
+    }
+
+    const [source, selector] = predicate[1].replace(/[${}]/g, '').split('.');
+
+    return this.variants.items.find(
+      (variant) => variant.context[source][selector] === predicate[2]
+    );
+  }
+
+  createBuild(type: BuildConfig['type']) {
+    this.builds.push({
+      type,
+      variants: [],
+    });
+  }
+
+  async runBuild(index) {
+    const { data } = await this.client.post(
+      ApiType.NORMAL,
+      `/adsets/${this.adsetId}/builds`,
+      this.builds[index]
+    );
+
+    return data;
+  }
+
+  addVariantToBuild(variant: Variant) {}
+
+  // Context Rules
 
   addContextRule(rule: ContextRule) {
     rule.assignments.forEach((assignment) => {
@@ -122,7 +189,7 @@ export default class Adset implements Entity {
     this.content.data.rules.push(rule);
   }
 
-  removeContextRuleByPredicate(predicate: Predicate) {
+  removeContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
     const index = this.content.data.rules.findIndex(
       (contextRule) =>
         JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
@@ -135,7 +202,7 @@ export default class Adset implements Entity {
     return null;
   }
 
-  getContextRuleByPredicate(predicate: Predicate) {
+  getContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
     const rule = this.content.data.rules.find(
       (contextRule) =>
         JSON.stringify(contextRule.predicate) === JSON.stringify(predicate)
@@ -143,6 +210,8 @@ export default class Adset implements Entity {
 
     return rule;
   }
+
+  // Placeholders
 
   addPlaceholder(placeholder: Placeholder) {
     if (!placeholder.defaultValue) {
