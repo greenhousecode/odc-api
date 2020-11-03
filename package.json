@@ -1,6 +1,6 @@
 {
   "name": "odc-api",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "API that simplifies working with the WPP ODC platform",
   "scripts": {
     "dev": "rollup -cw",
