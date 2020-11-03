@@ -1,6 +1,6 @@
 const create = (
   field: string,
-  operator: '=',
+  operator: string,
   value: string,
   source = 'custom'
 ) => [operator, `\${${source}.${field}}`, value] as Predicate;
