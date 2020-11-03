@@ -1,5 +1,6 @@
 import FormData from 'form-data';
 import ODC, { ApiType } from '../ODCAuthClient';
+import Build, { Variant } from './Build';
 
 export interface Assignment {
   expr: string;
@@ -33,24 +34,9 @@ export interface Content {
   };
 }
 
-export interface Variant {
-  content: NestedSchemas;
-  context: NestedSchemas;
-}
-
 export interface VariantsConfig {
   count: number;
   items: Variant[];
-}
-
-export interface BuildVariant {
-  context: NestedSchemas;
-  'template-revision-id': number;
-}
-
-export interface BuildConfig {
-  type: 'video';
-  variants: BuildVariant[];
 }
 
 export type ContentStage = 'draft' | 'published';
@@ -68,8 +54,6 @@ export default class Adset implements Entity {
   public content: Content;
 
   public variants: VariantsConfig;
-
-  public builds: BuildConfig[];
 
   constructor(
     private client: ODC,
@@ -132,7 +116,17 @@ export default class Adset implements Entity {
     );
   }
 
-  // Variants
+  // Variants and Builds
+
+  async runBuild(build: Build) {
+    const { data } = await this.client.post(
+      ApiType.NORMAL,
+      `/adsets/${this.adsetId}/builds`,
+      build
+    );
+
+    return data;
+  }
 
   getVariantByPredicate(predicate: Predicate | ComposedPredicate) {
     if (!this.variants) {
@@ -147,26 +141,7 @@ export default class Adset implements Entity {
       (variant) => variant.context[source][selector] === predicate[2]
     );
   }
-
-  createBuild(type: BuildConfig['type']) {
-    this.builds.push({
-      type,
-      variants: [],
-    });
-  }
-
-  async runBuild(index) {
-    const { data } = await this.client.post(
-      ApiType.NORMAL,
-      `/adsets/${this.adsetId}/builds`,
-      this.builds[index]
-    );
-
-    return data;
-  }
-
-  addVariantToBuild(variant: Variant) {}
-
+]
   // Context Rules
 
   addContextRule(rule: ContextRule) {
@@ -200,6 +175,11 @@ export default class Adset implements Entity {
     }
 
     return null;
+  }
+
+  removeAllContextRules() {
+    const defaults = this.content.data.rules.shift();
+    this.content.data.rules = [defaults];
   }
 
   getContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
