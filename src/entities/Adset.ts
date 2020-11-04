@@ -137,7 +137,7 @@ export default class Adset implements Entity {
     return null;
   }
 
-  async getBuild(buildId) {
+  async getBuild(buildId: number) {
     const { data } = await this.client.get(
       ApiType.NORMAL,
       `/adsets/${this.adsetId}/builds/${buildId}/variants`
