@@ -119,10 +119,15 @@ export default class Adset implements Entity {
   // Variants and Builds
 
   async runBuild(build: Build) {
+    const payload = {
+      type: build.type,
+      variants: [...build.variants],
+    };
+
     const { data } = await this.client.post(
       ApiType.NORMAL,
       `/adsets/${this.adsetId}/builds`,
-      build
+      payload
     );
 
     return data;
@@ -141,7 +146,7 @@ export default class Adset implements Entity {
       (variant) => variant.context[source][selector] === predicate[2]
     );
   }
-]
+
   // Context Rules
 
   addContextRule(rule: ContextRule) {

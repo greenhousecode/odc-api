@@ -1,4 +1,4 @@
-import ODC, { ApiType } from '../ODCAuthClient';
+import deepEqual from 'deep-equal';
 
 export interface Variant {
   content: NestedSchemas;
@@ -10,15 +10,35 @@ export interface BuildVariant {
   'template-revision-id': number;
 }
 
+// ToDo: add extra build types
+export type BuildType = 'video';
+
 export interface BuildConfig {
-  type: 'video';
+  type: BuildType;
   variants: BuildVariant[];
 }
 
 export default class Build {
-  public variants: Variant[] = [];
+  public variants: BuildVariant[] = [];
 
-  constructor(private client: ODC, public type: BuildConfig['type']) {}
+  constructor(public type: BuildType) {}
 
-  addVariant(templateRevisionId: number, variant: Variant) {}
+  addVariant(templateRevisionId: number, variant: Variant | BuildVariant) {
+    this.variants.push({
+      'template-revision-id': templateRevisionId,
+      context: variant.context,
+    });
+  }
+
+  removeVariant(variant: Variant | BuildVariant) {
+    const index = this.variants.findIndex((item) =>
+      deepEqual(item.context, variant.context)
+    );
+
+    if (index > -1) {
+      return this.variants.splice(index, 1)[0];
+    }
+
+    return null;
+  }
 }

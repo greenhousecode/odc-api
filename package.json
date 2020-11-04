@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "axios": "^0.20.0",
+    "deep-equal": "^2.0.4",
     "form-data": "^3.0.0"
   }
 }
