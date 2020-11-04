@@ -119,17 +119,37 @@ export default class Adset implements Entity {
   // Variants and Builds
 
   async runBuild(build: Build) {
-    const payload = {
-      type: build.type,
-      variants: [...build.variants],
-    };
+    if (build.variants.length) {
+      const payload = {
+        type: build.type,
+        variants: [...build.variants],
+      };
 
-    const { data } = await this.client.post(
+      const { data } = await this.client.post(
+        ApiType.NORMAL,
+        `/adsets/${this.adsetId}/builds`,
+        payload
+      );
+
+      return data;
+    }
+
+    return null;
+  }
+
+  async getBuild(buildId: number) {
+    const { data } = await this.client.get(
       ApiType.NORMAL,
-      `/adsets/${this.adsetId}/builds`,
-      payload
+      `/adsets/${this.adsetId}/builds/${buildId}`
     );
+    return data;
+  }
 
+  async getBuildVariants(buildId: number) {
+    const { data } = await this.client.get(
+      ApiType.NORMAL,
+      `/adsets/${this.adsetId}/builds/${buildId}/variants`
+    );
     return data;
   }
 
