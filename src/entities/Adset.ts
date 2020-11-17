@@ -41,7 +41,7 @@ export interface VariantsConfig {
 
 export type ContentStage = 'draft' | 'published';
 
-const EXPRESSION_VALUE_CHAR_LIMIT = 1024;
+const EXPRESSION_VALUE_CHAR_LIMIT = 2048;
 
 // doesnt work yet..
 function hasCorrectContentFormat(
