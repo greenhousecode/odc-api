@@ -10,6 +10,7 @@ export interface Assignment {
 export interface ContextRule {
   assignments: Assignment[];
   predicate: Predicate;
+  name?: string;
 }
 
 export interface Placeholder {
@@ -169,6 +170,13 @@ export default class Adset implements Entity {
 
   // Context Rules
 
+  createNextContextRuleName = () => {
+    const rules = [...this.content.data.rules];
+    const { name } = rules.pop();
+    const number = Number(name.match(/\d+$/));
+    return `rule${number + 1}`;
+  };
+
   addContextRule(rule: ContextRule) {
     rule.assignments.forEach((assignment) => {
       if (!assignment.expr || typeof assignment.expr !== 'string') {
@@ -186,7 +194,10 @@ export default class Adset implements Entity {
       }
     });
 
-    this.content.data.rules.push(rule);
+    this.content.data.rules.push({
+      ...rule,
+      name: rule.name || this.createNextContextRuleName(),
+    });
   }
 
   removeContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
