@@ -56,8 +56,6 @@ export default class Adset implements Entity {
 
   public variants: VariantsConfig;
 
-  public hasChanges = false;
-
   constructor(
     private client: ODC,
     private adsetId: number,
@@ -201,8 +199,6 @@ export default class Adset implements Entity {
     });
 
     this.content.data.rules.push(rule);
-
-    this.hasChanges = true;
   }
 
   removeContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
@@ -215,16 +211,12 @@ export default class Adset implements Entity {
       return this.content.data.rules.splice(index, 1)[0];
     }
 
-    this.hasChanges = true;
-
     return null;
   }
 
   removeAllContextRules() {
     const defaults = this.content.data.rules.shift();
     this.content.data.rules = [defaults];
-
-    this.hasChanges = true;
   }
 
   getContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
@@ -254,8 +246,6 @@ export default class Adset implements Entity {
       expr: defaultValue,
       name: placeholder.name,
     });
-
-    this.hasChanges = true;
   }
 
   removePlaceholder(placeholder: Placeholder) {
@@ -272,8 +262,6 @@ export default class Adset implements Entity {
       this.content.data.rules[0].assignments.splice(assignmentIndex, 1);
       return this.content.data.placeholders.splice(placeholderIndex, 1)[0];
     }
-
-    this.hasChanges = true;
 
     return null;
   }
