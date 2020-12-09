@@ -14,7 +14,7 @@ export interface ContextRule {
 }
 
 export interface Placeholder {
-  type: 'text' | 'click' | 'audio' | 'video' | 'image';
+  type: 'text' | 'click' | 'audio' | 'video' | 'image' | string;
   name: string;
   defaultValue?: string;
 }
@@ -107,6 +107,17 @@ export default class Adset implements Entity {
       );
     }
 
+    // Rules require to have an indexed incremental name
+    this.content.data.rules = this.content.data.rules.map((rule, index) =>
+      // The first rule is the default, so it doesn't have a name
+      index
+        ? rule
+        : {
+            ...rule,
+            name: `rule${index - 1}`,
+          }
+    );
+
     const formData = new FormData();
     formData.append('json', JSON.stringify(this.content));
 
@@ -170,13 +181,6 @@ export default class Adset implements Entity {
 
   // Context Rules
 
-  createNextContextRuleName = () => {
-    const rules = [...this.content.data.rules];
-    const { name } = rules.pop();
-    const number = Number(name.match(/\d+$/));
-    return `rule${number + 1}`;
-  };
-
   addContextRule(rule: ContextRule) {
     rule.assignments.forEach((assignment) => {
       if (!assignment.expr || typeof assignment.expr !== 'string') {
@@ -194,10 +198,7 @@ export default class Adset implements Entity {
       }
     });
 
-    this.content.data.rules.push({
-      ...rule,
-      name: rule.name || this.createNextContextRuleName(),
-    });
+    this.content.data.rules.push(rule);
   }
 
   removeContextRuleByPredicate(predicate: Predicate | ComposedPredicate) {
