@@ -10,10 +10,11 @@ export interface Assignment {
 export interface ContextRule {
   assignments: Assignment[];
   predicate: Predicate;
+  name?: string;
 }
 
 export interface Placeholder {
-  type: 'text' | 'click' | 'audio' | 'video' | 'image';
+  type: 'text' | 'click' | 'audio' | 'video' | 'image' | string;
   name: string;
   defaultValue?: string;
 }
@@ -105,6 +106,17 @@ export default class Adset implements Entity {
         'Cannot save Adset content, as the format of the content is incorrect.'
       );
     }
+
+    // Rules require to have an indexed incremental name
+    this.content.data.rules = this.content.data.rules.map((rule, index) =>
+      // The first rule is the default, so it doesn't have a name
+      index > 0
+        ? {
+            ...rule,
+            name: `rule${index - 1}`,
+          }
+        : rule
+    );
 
     const formData = new FormData();
     formData.append('json', JSON.stringify(this.content));
