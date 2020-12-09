@@ -110,12 +110,12 @@ export default class Adset implements Entity {
     // Rules require to have an indexed incremental name
     this.content.data.rules = this.content.data.rules.map((rule, index) =>
       // The first rule is the default, so it doesn't have a name
-      index
-        ? rule
-        : {
+      index > 0
+        ? {
             ...rule,
             name: `rule${index - 1}`,
           }
+        : rule
     );
 
     const formData = new FormData();
