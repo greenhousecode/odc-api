@@ -25,8 +25,8 @@ export default class AdsetService {
     rules: ContextRule[],
     stage: ContentStage = 'draft'
   ) {
-    const adset = new Adset(this.client, adsetId, stage);
-    await adset.syncContent();
+    const adset = new Adset(this.client, adsetId);
+    await adset.syncContent(stage);
     rules.forEach((rule) => adset.addContextRule(rule));
     await adset.saveChanges();
   }
@@ -44,8 +44,8 @@ export default class AdsetService {
     predicates: Predicate[],
     stage: ContentStage = 'draft'
   ) {
-    const adset = new Adset(this.client, adsetId, stage);
-    await adset.syncContent();
+    const adset = new Adset(this.client, adsetId);
+    await adset.syncContent(stage);
 
     predicates.forEach((predicate) =>
       adset.removeContextRuleByPredicate(predicate)
@@ -67,8 +67,8 @@ export default class AdsetService {
     placeholders: Placeholder[],
     stage: ContentStage = 'draft'
   ) {
-    const adset = new Adset(this.client, adsetId, stage);
-    await adset.syncContent();
+    const adset = new Adset(this.client, adsetId);
+    await adset.syncContent(stage);
     placeholders.forEach((placeholder) => adset.addPlaceholder(placeholder));
     await adset.saveChanges();
   }

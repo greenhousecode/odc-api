@@ -18,11 +18,6 @@ type Predicate = true | [string, string, string];
 
 type ComposedPredicate = ExpandTuple<string, Predicate[]>;
 
-interface Entity {
-  syncContent(): Promise<void>;
-  saveChanges(): Promise<void>;
-}
-
 interface NestedSchemas {
   [key: string]: NestedSchemas | string;
 }
