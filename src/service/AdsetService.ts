@@ -28,7 +28,7 @@ export default class AdsetService {
     const adset = new Adset(this.client, adsetId);
     await adset.syncContent(stage);
     rules.forEach((rule) => adset.addContextRule(rule));
-    await adset.saveChanges();
+    await adset.saveChanges(stage);
   }
 
   removeContextRuleByPredicate(
@@ -51,7 +51,7 @@ export default class AdsetService {
       adset.removeContextRuleByPredicate(predicate)
     );
 
-    await adset.saveChanges();
+    await adset.saveChanges(stage);
   }
 
   addPlaceholder(
@@ -70,6 +70,6 @@ export default class AdsetService {
     const adset = new Adset(this.client, adsetId);
     await adset.syncContent(stage);
     placeholders.forEach((placeholder) => adset.addPlaceholder(placeholder));
-    await adset.saveChanges();
+    await adset.saveChanges(stage);
   }
 }

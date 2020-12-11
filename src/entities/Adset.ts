@@ -42,6 +42,16 @@ export interface VariantsConfig {
 
 export type ContentStage = 'draft' | 'published';
 
+type StagedContentFunction<T extends string = undefined> = {
+  id: number;
+  name: T;
+};
+
+type ContentOverview = {
+  publishedContentFunction?: StagedContentFunction;
+  stagedContentFunctions: StagedContentFunction<'draft'>[];
+};
+
 const EXPRESSION_VALUE_CHAR_LIMIT = 2048;
 
 // doesnt work yet..
@@ -58,13 +68,22 @@ export default class Adset {
 
   constructor(private client: ODC, private adsetId: number) {}
 
-  async getOverview() {
+  async getDetails() {
     const { data } = await this.client.get(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}`
     );
 
     return data;
+  }
+
+  async getContentOverview() {
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function/overview`
+    );
+
+    return data as ContentOverview;
   }
 
   async getContentVariants() {
