@@ -42,6 +42,16 @@ export interface VariantsConfig {
 
 export type ContentStage = 'draft' | 'published';
 
+type StagedContentFunction<T extends string = undefined> = {
+  id: number;
+  name: T;
+};
+
+type ContentOverview = {
+  publishedContentFunction?: StagedContentFunction;
+  stagedContentFunctions: StagedContentFunction<'draft'>[];
+};
+
 const EXPRESSION_VALUE_CHAR_LIMIT = 2048;
 
 // doesnt work yet..
@@ -51,24 +61,29 @@ function hasCorrectContentFormat(
   return !!(toBeDetermined as Content);
 }
 
-export default class Adset implements Entity {
+export default class Adset {
   public content: Content;
 
   public variants: VariantsConfig;
 
-  constructor(
-    private client: ODC,
-    private adsetId: number,
-    private stage: ContentStage
-  ) {}
+  constructor(private client: ODC, private adsetId: number) {}
 
-  async getOverview() {
+  async getDetails() {
     const { data } = await this.client.get(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}`
     );
 
     return data;
+  }
+
+  async getContentOverview() {
+    const { data } = await this.client.get(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function/overview`
+    );
+
+    return data as ContentOverview;
   }
 
   async getContentVariants() {
@@ -91,16 +106,35 @@ export default class Adset implements Entity {
     this.variants = data;
   }
 
-  async syncContent() {
+  async getContentStage(stage: ContentStage) {
     const { data } = await this.client.get(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`
+      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`
     );
 
-    this.content = data;
+    return data;
   }
 
-  async saveChanges() {
+  async syncContent(stage: ContentStage) {
+    const content = await this.getContentStage(stage);
+
+    this.content = content;
+  }
+
+  async createContentStage(stage: ContentStage, content: Content) {
+    const formData = new FormData();
+    formData.append('json', JSON.stringify(content));
+
+    const response = await this.client.put(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function?stage=${stage}`,
+      formData
+    );
+
+    return response.status === 204;
+  }
+
+  async saveChanges(stage: ContentStage) {
     if (!hasCorrectContentFormat(this.content)) {
       throw new Error(
         'Cannot save Adset content, as the format of the content is incorrect.'
@@ -118,14 +152,7 @@ export default class Adset implements Entity {
         : rule
     );
 
-    const formData = new FormData();
-    formData.append('json', JSON.stringify(this.content));
-
-    await this.client.put(
-      ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function?stage=${this.stage}`,
-      formData
-    );
+    return this.createContentStage(stage, this.content);
   }
 
   // Variants and Builds
