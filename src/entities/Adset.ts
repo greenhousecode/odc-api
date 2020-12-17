@@ -117,7 +117,6 @@ export default class Adset {
 
   async syncContent(stage: ContentStage) {
     const content = await this.getContentStage(stage);
-
     this.content = content;
   }
 
@@ -152,7 +151,17 @@ export default class Adset {
         : rule
     );
 
-    return this.createContentStage(stage, this.content);
+    if (stage === 'draft') {
+      return this.createContentStage('draft', this.content);
+    }
+
+    this.createContentStage('draft', this.content);
+
+    return this.client.post(
+      ApiType.LEGACY,
+      `/adsets-2/${this.adsetId}/content-function/publish?stage=${stage}`,
+      null
+    );
   }
 
   // Variants and Builds
