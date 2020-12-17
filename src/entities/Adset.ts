@@ -155,7 +155,7 @@ export default class Adset {
       return this.createContentStage('draft', this.content);
     }
 
-    this.createContentStage('draft', this.content);
+    await this.createContentStage('draft', this.content);
 
     return this.client.post(
       ApiType.LEGACY,
