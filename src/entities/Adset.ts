@@ -159,8 +159,11 @@ export default class Adset {
 
     return this.client.post(
       ApiType.LEGACY,
-      `/adsets-2/${this.adsetId}/content-function/publish?stage=${stage}`,
-      null
+      `/adsets-2/${this.adsetId}/content-function/publish?stage=draft`,
+      null,
+      {
+        'Content-Type': 'application/json',
+      }
     );
   }
 
