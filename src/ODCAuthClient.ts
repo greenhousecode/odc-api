@@ -89,33 +89,37 @@ export default class ODCAuthClient implements AuthClient {
     apiType: ApiType,
     path: string,
     method: 'GET' | 'POST' | 'PUT',
-    data?: FormData | any,
-    refreshAuth = true
+    data?: FormData | null | any,
+    refreshAuth = true,
+    headers = {}
   ) {
     if (refreshAuth) await this.authenticate();
 
-    return axios({
+    const options = {
       url: `${ApiTypes[apiType]}${path}`,
       method,
-      data: data && method !== 'GET' ? data : undefined,
+      data: (data || data === null) && method !== 'GET' ? data : undefined,
       headers: {
         ...(this.authentication
           ? { Authorization: `lemonpi ${this.authentication['auth-token']}` }
           : {}),
         ...(data instanceof FormData ? { ...data.getHeaders() } : {}),
+        ...(headers || {}),
       },
-    });
+    };
+
+    return axios(options);
   }
 
-  async get(apiType: ApiType, path: string) {
-    return this.request(apiType, path, 'GET');
+  async get(apiType: ApiType, path: string, headers = {}) {
+    return this.request(apiType, path, 'GET', undefined, true, headers);
   }
 
-  async post(apiType: ApiType, path: string, data) {
-    return this.request(apiType, path, 'POST', data);
+  async post(apiType: ApiType, path: string, data, headers = {}) {
+    return this.request(apiType, path, 'POST', data, true, headers);
   }
 
-  async put(apiType: ApiType, path: string, data) {
-    return this.request(apiType, path, 'PUT', data);
+  async put(apiType: ApiType, path: string, data, headers = {}) {
+    return this.request(apiType, path, 'PUT', data, true, headers);
   }
 }
