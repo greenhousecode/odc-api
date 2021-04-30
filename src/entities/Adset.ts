@@ -225,16 +225,6 @@ export default class Adset {
       if (!assignment.expr || typeof assignment.expr !== 'string') {
         throw new Error('Please provide an expr value of type String');
       }
-
-      if (assignment.expr.length > EXPRESSION_VALUE_CHAR_LIMIT) {
-        throw new Error(
-          `Assignment expression exceeds ODC character limit (${EXPRESSION_VALUE_CHAR_LIMIT} characters). Have a look at this assignment: ${JSON.stringify(
-            assignment,
-            null,
-            2
-          )}`
-        );
-      }
     });
 
     this.content.data.rules.push(rule);
