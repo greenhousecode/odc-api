@@ -21,6 +21,8 @@ export interface Placeholder {
 
 export interface Context {
   alias: 'custom';
+  param: string[] | null;
+  schema: string;
 }
 
 export interface Content {
@@ -51,8 +53,6 @@ type ContentOverview = {
   publishedContentFunction?: StagedContentFunction;
   stagedContentFunctions: StagedContentFunction<'draft'>[];
 };
-
-const EXPRESSION_VALUE_CHAR_LIMIT = 2048;
 
 // doesnt work yet..
 function hasCorrectContentFormat(
@@ -151,12 +151,10 @@ export default class Adset {
         : rule
     );
 
-    if (stage === 'draft') {
-      return this.createContentStage('draft', this.content);
-    }
-
+    // create new draft
     await this.createContentStage('draft', this.content);
 
+    // publish draft
     return this.client.post(
       ApiType.LEGACY,
       `/adsets-2/${this.adsetId}/content-function/publish?stage=draft`,
