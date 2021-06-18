@@ -62,6 +62,30 @@ export default class ODCAuthClient implements AuthClient {
     this.authentication = response.data;
   }
 
+  private async switchAgency(agencyId: number) {
+
+    if (!agencyId) {
+      throw new Error('Please provide the ID of the agency you would like to switch to.');
+    }
+
+    if (!this.authentication) {
+      throw new Error('Please authenticate first before switching to an agency.');
+    }
+
+    const response = await this.request(
+      ApiType.NORMAL,
+      'auth/switch-agency',
+      'POST',
+      {
+        'agency-id': agencyId,
+      },
+      false
+    );
+
+    this.expiredAt = Date.now() + AUTH_TOKEN_LIFETIME;
+    this.authentication = response.data;
+  }
+
   async authenticate() {
     if (
       this.authentication &&
