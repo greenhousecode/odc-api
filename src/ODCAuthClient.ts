@@ -74,7 +74,7 @@ export default class ODCAuthClient implements AuthClient {
 
     const response = await this.request(
       ApiType.NORMAL,
-      'auth/switch-agency',
+      '/auth/switch-agency',
       'POST',
       {
         'agency-id': agencyId,
