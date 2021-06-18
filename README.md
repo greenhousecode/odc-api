@@ -53,6 +53,18 @@ Exposes three different methods:
 - POST
 - UPDATE
 
+#### Switch to another agency
+
+When your account has access to multiple agencies, you should explicitely switch to that agency.
+
+Usage:
+
+```js
+authclient.switchAgency(1);
+```
+
+Please note that it's a best practise to create a dedicated account for API usage.
+
 ## Entitites
 
 ### Adset
