@@ -62,29 +62,6 @@ export default class ODCAuthClient implements AuthClient {
     this.authentication = response.data;
   }
 
-  async authenticate() {
-    if (
-      this.authentication &&
-      typeof this.authentication['auth-token'] !== 'undefined'
-    ) {
-      if (Date.now() >= this.expiredAt) {
-        try {
-          await this.refreshAuth();
-          return this.authentication['auth-token'];
-        } catch (e) {
-          this.authentication = null;
-          return this.authenticate();
-        }
-      }
-
-      return this.authentication['auth-token'];
-    }
-
-    await this.createAuth();
-
-    return this.authentication['auth-token'];
-  }
-
   private async request(
     apiType: ApiType,
     path: string,
@@ -121,5 +98,55 @@ export default class ODCAuthClient implements AuthClient {
 
   async put(apiType: ApiType, path: string, data, headers = {}) {
     return this.request(apiType, path, 'PUT', data, true, headers);
+  }
+
+  async switchAgency(agencyId: number) {
+    if (!agencyId) {
+      throw new Error(
+        'Please provide the ID of the agency you would like to switch to.'
+      );
+    }
+
+    if (!this.authentication) {
+      throw new Error(
+        'Please authenticate first before switching to an agency.'
+      );
+    }
+
+    const response = await this.request(
+      ApiType.NORMAL,
+      '/auth/switch-agency',
+      'POST',
+      {
+        'agency-id': agencyId,
+      },
+      false
+    );
+
+    this.expiredAt = Date.now() + AUTH_TOKEN_LIFETIME;
+    this.authentication = response.data;
+  }
+
+  async authenticate() {
+    if (
+      this.authentication &&
+      typeof this.authentication['auth-token'] !== 'undefined'
+    ) {
+      if (Date.now() >= this.expiredAt) {
+        try {
+          await this.refreshAuth();
+          return this.authentication['auth-token'];
+        } catch (e) {
+          this.authentication = null;
+          return this.authenticate();
+        }
+      }
+
+      return this.authentication['auth-token'];
+    }
+
+    await this.createAuth();
+
+    return this.authentication['auth-token'];
   }
 }
